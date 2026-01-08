@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# ./skriptica --help
+# ./skriptica <ime_foldera>
+# Zadatak:
+# 	- Ako je prvi argument UPOMOC, ispisi usage skriptice i kratak opis sta radi
+#	- Ako nema prvog argumenta ispisi samo usage
+#	- Ako je prvi argument string, proveri da li je folder ili obican fajl
+#		- Ako je folder, uradi nesto sa svim njegovim fajlovima
+#		- Ispisi imena svih fajlova ciji je naziv kraci od 10 karaktera
+
+if [ $1 == "--help" ]; then
+	echo "Ich sehe was du nichts siehts"
+	exit 0
+fi
+
+if [ -z $1 ]; then
+	echo "Manche Engel tragen Jeans"
+	exit 1
+fi
+
+for fajl in $1/*; do
+	ime=$(basename "$fajl")
+
+	if [ ${#ime} -lt 4 ]; then
+		echo "$ime"
+	fi
+
+done

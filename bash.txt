@@ -1,0 +1,125 @@
+ls -la
+cat .bashrc 
+ #TODO 
+ 	-customize terminal
+ 	
+#!/bin/bash
+ 	
+- SHA-Bang (#!) na čelu skripte govori vašem sistemu da
+je fajl skup komandi koje se daju navedenom
+komandnom prevodiocu
+- #! je zapravo dvobajtni magični broj, poseban marker
+koji označava tip datoteke
+ 	
+
+-always use " "
+
+poruka="Dobar dan svima"
+echo $poruka
+
+fajl="moj fajl sa razmacima.txt"
+rm $fajl  => #WRONG, if i don't put the $ sign he tries to delete fajl file, if i put the $ iit just takes the value of fajl aka moj fajl sa razmacima.txt
+
+rm "$fajl"   # sad je OK!
+
+Situacija,			Ispravan način,				Loš način
+Lepiš tekst uz varijablu,	${var}tekst,				$vartekst
+Dodela vrednosti,		"var=""vrednost"""			"var = ""vrednost"" (razmaci!)"
+Provera stringova		"[[ ""$var"" == ""nešto"" ]]"		[ $var = nešto ] (nesigurno)
+Provera brojeva,		[[ $var -eq 5 ]]			"[[ $var = 5 ]] (radi, ali manje jasno)"
+Neinicijalizovana varijabla,	"Vrednost je """" (prazan string)",	Ne misli da je 0!
+
+
+Indirektna referenca – kako uzeti poslednji argument?
+
+args=$#                  # args postaje broj argumenata, npr. 4
+lastarg=${!args}         # Indirektno: uzmi varijablu čije ime je vrednost $args → ${!4} = $4
+# Ili kraće: lastarg=${!#}
+
+For petlja:
+	for arg in [list]
+	do
+		command(s)...
+	done
+Ako je do u istoj liniji sa for, moramo posle liste da
+stavimo ;
+	for arg in [list] ; do
+	
+While petlja:
+while [condition]
+do
+command(s)...
+done
+Važi isto pravilo za do u istoj liniji sa petljom:
+while [condition]; do
+
+#!/bin/bash
+
+brojac=0
+LIMIT=10
+
+while [[ $brojac -lt $LIMIT ]]; do
+    echo -n "$brojac "
+    ((brojac++))
+done
+
+echo    # novi red
+
+-lt less than
+
+
+# Define a local variable in a function
+my_function() {
+  local local_var="I am local"
+  echo $local_var
+}
+my_function ==> poziv funkcije
+
+# String example
+greeting="Hello, World!"
+name="Alice"
+full_greeting="$greeting, $name!"
+echo $full_greeting
+Za echo nema veze koji navodnici :)
+
+
+
+-eq: Equal to
+-ne: Not equal to
+-lt: Less than
+-le: Less than or equal to
+-gt: Greater than
+-ge: Greater than or equal to
+
+
+
+String Comparison Operators
+=: Equal to
+!=: Not equal to
+<: Less than, in ASCII alphabetical order
+>: Greater than, in ASCII alphabetical order
+
+
+
+File Test Operators
+-e: Checks if a file exists
+-d: Checks if a directory exists
+-f: Checks if a file is a regular file
+-s: Checks if a file is not empty
+
+# Basic if statement
+num=15
+if [ $num -gt 10 ]; then
+  echo "Number is greater than 10"
+fi
+
+if - then fi
+for - do done
+case - is esac
+while - do done
+
+
+$(($1+$2))
+
+
+"${fruits[@]}" je najbolji i najsigurniji način za prolazak kroz sve elemente niza
