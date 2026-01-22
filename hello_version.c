@@ -1,215 +1,152 @@
-// SPDX-License-Identifier: GPL-2.0-only
-
 #include <linux/init.h>
-
 #include <linux/module.h>
-
-#include <linux/slab.h>
-
-#include <linux/gfp.h>
-
 #include <linux/kernel.h>
-
-#include <linux/moduleparam.h>
-
-#include <linux/printk.h>
-
 #include <linux/fs.h>
-
-#include <linux/device.h>
-
-#include <linux/cdev.h>
-
+#include <linux/slab.h>
 #include <linux/uaccess.h>
+#include <linux/cdev.h>
+#include <linux/ioctl.h>
+#include <linux/ctype.h>     // za tolower() i toupper()
 
-#include <linux/string.h>
+static int buff_size = 1000;
+module_param(buff_size, int, 0);
 
-#define IME_UREDJAJA "zadatak1"
+static char *buff;
+static dev_t dev_hello;
+static int hello_count = 1;
+static struct cdev cdev_hello;
 
-MODULE_LICENSE("GPL");
+// ioctl komande
+#define HELLO_MAGIC 'h'
+#define HELLO_IOCTL_LOWER_ALL          _IO(HELLO_MAGIC, 1)   // 1 - sve mala slova
+#define HELLO_IOCTL_LOWER_FIRST_UPPER  _IO(HELLO_MAGIC, 2)   // 2 - prvo malo, ostalo veliko
 
-static int velicina_bafera = 10;
-
-module_param(velicina_bafera, int, 0600);
-
-MODULE_PARM_DESC(velicina_bafera, "Velicina bafera za modul");
-
-static char *bafer;
-
-static struct cdev moj_cdev;
-
-static dev_t broj_uredjaja;
-
-static int glavni_broj;
-
-static struct class *klasa_uredjaja;
-
-static unsigned int brojac_malih_slova;
-
-static const char *poruka_manje = "Number of lowercase letters is less than 4.\n";
-
-static const char *poruka_vise  = "Number of lowercase letters is 4 or greater than 4.\n";
-
-static ssize_t citanje_uredjaja(struct file *fajl, char __user *korisnicki_bafer,
-
-				size_t duzina, loff_t *pomeraj)
-
+static ssize_t
+hello_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 {
-
-	const char *poruka = (brojac_malih_slova < 4) ? poruka_manje : poruka_vise;
-
-	size_t duzina_poruke = strlen(poruka);
-
-	if (*pomeraj >= duzina_poruke)
-
-		return 0;
-
-	if (copy_to_user(korisnicki_bafer, poruka, duzina_poruke))
-
-		return -EFAULT;
-
-	*pomeraj += duzina_poruke;
-
-	return duzina_poruke;
-
+    int remaining_size, transfer_size;
+    remaining_size = buff_size - (int)(*ppos); // bytes left to transfer
+    if (remaining_size == 0) { /* All read, returning 0 (End Of File) */
+        return 0;
+    }
+    /* Size of this transfer */
+    transfer_size = min(remaining_size, (int)count);
+    if (copy_to_user(buf, buff + *ppos, transfer_size)) {
+        return -EFAULT;
+    } else { /* Increase the position in the open file */
+        *ppos += transfer_size;
+        return transfer_size;
+    }
 }
 
-static ssize_t pisanje_uredjaja(struct file *fajl, const char __user *korisnicki_bafer,
-
-				size_t duzina, loff_t *pomeraj)
-
+static ssize_t
+hello_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
 {
-
-	size_t velicina_upisa = min(velicina_bafera - 1, duzina);
-
-	size_t nekopirano;
-
-	int i;
-
-	nekopirano = copy_from_user(bafer, korisnicki_bafer, velicina_upisa);
-
-	if (nekopirano)
-
-		return -EFAULT;
-
-	bafer[velicina_upisa] = '\0';	/* safe even if velicina_upisa == 0 */
-
-	*pomeraj += velicina_upisa;
-
-	brojac_malih_slova = 0;
-
-	for (i = 0; i < velicina_upisa; i++) {
-
-		if (bafer[i] >= 'a' && bafer[i] <= 'z')
-
-			brojac_malih_slova++;
-
-	}
-
-	return velicina_upisa;
-
+    int remaining_bytes;
+    remaining_bytes = buff_size - (int)(*ppos);
+    if (count > remaining_bytes) {
+        /* Can't write beyond the end of the device */
+        return -EIO;
+    }
+    if (copy_from_user(buff + *ppos, buf, count)) {
+        return -EFAULT;
+    } else {
+        /* Increase the position in the open file */
+        *ppos += count;
+        return count;
+    }
 }
 
-static const struct file_operations operacije = {
+static long hello_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+{
+    int i;
 
-	.owner	= THIS_MODULE,
+    switch (cmd) {
+    case HELLO_IOCTL_LOWER_ALL:
+        // Komanda 1: ceo bafer u mala slova
+        for (i = 0; i < buff_size; i++) {
+            if (buff[i] != '\0') {
+                buff[i] = tolower(buff[i]);
+            }
+        }
+        pr_info("hello: ceo bafer pretvoren u mala slova\n");
+        break;
 
-	.read	= citanje_uredjaja,
+    case HELLO_IOCTL_LOWER_FIRST_UPPER:
+        // Komanda 2: prvo slovo malo, ostalo veliko
+        if (buff_size > 0 && buff[0] != '\0') {
+            buff[0] = tolower(buff[0]);
+        }
+        for (i = 1; i < buff_size; i++) {
+            if (buff[i] != '\0') {
+                buff[i] = toupper(buff[i]);
+            }
+        }
+        pr_info("hello: prvo slovo malo, ostatak u velika slova\n");
+        break;
 
-	.write	= pisanje_uredjaja,
+    default:
+        pr_err("hello: nepoznata ioctl komanda: %u\n", cmd);
+        return -EINVAL;
+    }
 
+    return 0;
+}
+
+static struct file_operations fops_hello = {
+    .owner          = THIS_MODULE,
+    .read           = hello_read,
+    .write          = hello_write,
+    .unlocked_ioctl = hello_ioctl,   // <--- OVO JE DODATO
 };
 
-static int __init pokretanje_modula(void)
-
+static int __init hello_init(void)
 {
+    int err;
+    pr_info("Hello world!\n");
 
-	int ret;
+    buff = kmalloc(buff_size, GFP_KERNEL);
+    if (buff == NULL) {
+        pr_info("Error allocating buffer\n");
+        err = -ENOMEM;
+        goto err_exit;
+    }
+    memset(buff, 0x00, buff_size);
 
-	bafer = kmalloc(velicina_bafera, GFP_KERNEL);
+    if (alloc_chrdev_region(&dev_hello, 0, hello_count, "hello")) {
+        pr_info("Error allocating chardev region\n");
+        err = -ENODEV;
+        goto err_free_buff;
+    }
 
-	if (!bafer)
+    cdev_init(&cdev_hello, &fops_hello);
+    if (cdev_add(&cdev_hello, dev_hello, hello_count)) {
+        pr_info("Error adding device\n");
+        err = -ENODEV;
+        goto err_dev_unregister;
+    }
 
-		return -ENOMEM;
+    return 0;
 
-	ret = alloc_chrdev_region(&broj_uredjaja, 0, 1, IME_UREDJAJA);
-
-	if (ret) {
-
-		pr_err("Neuspela alokacija regiona za uredjaj\n");
-
-		kfree(bafer);
-
-		return ret;
-
-	}
-
-	glavni_broj = MAJOR(broj_uredjaja);
-
-	cdev_init(&moj_cdev, &operacije);
-
-	ret = cdev_add(&moj_cdev, MKDEV(glavni_broj, 0), 1);
-
-	if (ret) {
-
-		pr_err("Neuspelo dodavanje uredjaja\n");
-
-		unregister_chrdev_region(broj_uredjaja, 1);
-
-		kfree(bafer);
-
-		return ret;
-
-	}
-
-	klasa_uredjaja = class_create(THIS_MODULE, IME_UREDJAJA);
-
-	if (IS_ERR(klasa_uredjaja)) {
-
-		ret = PTR_ERR(klasa_uredjaja);
-
-		pr_err("Neuspelo kreiranje klase\n");
-
-		goto err_cdev;
-
-	}
-
-	device_create(klasa_uredjaja, NULL, MKDEV(glavni_broj, 0), NULL, IME_UREDJAJA);
-
-	pr_info("Modul %s uspesno ucitan\n", IME_UREDJAJA);
-
-	return 0;
-
-err_cdev:
-
-	cdev_del(&moj_cdev);
-
-	unregister_chrdev_region(broj_uredjaja, 1);
-
-	kfree(bafer);
-
-	return ret;
-
+err_dev_unregister:
+    unregister_chrdev_region(dev_hello, hello_count);
+err_free_buff:
+    kfree(buff);
+err_exit:
+    return err;
 }
 
-static void __exit zaustavljanje_modula(void)
-
+static void __exit hello_exit(void)
 {
-
-	device_destroy(klasa_uredjaja, MKDEV(glavni_broj, 0));
-
-	class_destroy(klasa_uredjaja);
-
-	cdev_del(&moj_cdev);
-
-	unregister_chrdev_region(broj_uredjaja, 1);
-
-	kfree(bafer);
-
-	pr_info("Modul %s iskljucen\n", IME_UREDJAJA);
-
+    pr_info("Goodbye!\n");
+    cdev_del(&cdev_hello);
+    unregister_chrdev_region(dev_hello, hello_count);
+    kfree(buff);
 }
 
-module_init(pokretanje_modula);
+module_init(hello_init);
+module_exit(hello_exit);
 
-module_exit(zaustavljanje_modula);
+MODULE_LICENSE("GPL");
+MODULE_DESCRIPTION("Greeting module");
+MODULE_AUTHOR("William Shakespeare");
