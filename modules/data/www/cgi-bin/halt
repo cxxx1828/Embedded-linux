@@ -1,0 +1,11 @@
+#!/bin/sh
+# Halts the system
+echo "Content-type: text/html"
+echo
+echo "<html><header></header><body>"
+echo "<h1>Switching off</h1>"
+echo "<font color=Blue>"
+echo "System shutdown initiated" 
+echo "</font>"
+echo "</body></html>"
+halt

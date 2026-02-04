@@ -1,0 +1,9 @@
+#!/bin/sh
+echo "Content-type: text/html"
+echo
+echo "<html><header></header><body>"
+echo "<h1>CPU information</h1>"
+echo "Your embedded device uses the below processor:<pre><font color=Blue>"
+echo `cat /proc/cpuinfo | grep CPUinfo`
+echo "</font></pre></u>"
+echo "</body></html>"

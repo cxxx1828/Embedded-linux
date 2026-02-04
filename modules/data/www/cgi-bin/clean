@@ -1,0 +1,13 @@
+#!/bin/sh
+# Create the /tmp directory if it doesn't exist yet
+mkdir -p /tmp
+rm -f /tmp/*
+echo "Content-type: text/html"
+echo
+echo "<html><header></header><body>"
+echo "<h1>Cleanup</h1>"
+echo "<font color=Blue>"
+echo "Files in your /tmp directory have been cleaned up." 
+echo "<br />Check by yourself!"
+echo "</font>"
+echo "</body></html>"

@@ -1,0 +1,12 @@
+diff -Nurp buildroot-2016.02/package/xenomai/xenomai.mk buildroot-2016.02-patched/package/xenomai/xenomai.mk
+--- buildroot-2016.02/package/xenomai/xenomai.mk	2016-03-01 21:47:30.000000000 +0100
++++ buildroot-2016.02-patched/package/xenomai/xenomai.mk	2017-11-27 18:46:19.788725767 +0100
+@@ -11,7 +11,7 @@ else
+ BR_NO_CHECK_HASH_FOR += $(XENOMAI_SOURCE)
+ endif
+ 
+-XENOMAI_SITE = http://download.gna.org/xenomai/stable
++XENOMAI_SITE = http://xenomai.org/downloads/xenomai/stable
+ XENOMAI_SOURCE = xenomai-$(XENOMAI_VERSION).tar.bz2
+ XENOMAI_LICENSE = headers: GPLv2+ with exception, libraries: LGPLv2.1+, kernel: GPLv2+, docs: GFDLv1.2+, ipipe patch and can driver: GPLv2
+ # GFDL is not included but refers to gnu.org
