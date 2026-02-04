@@ -1,0 +1,73 @@
+1. Koje tvrdnje su tacne
+
+a- staticki prevedeni modulu su uvek deo kernela
+b- dinamicki prevedeni moduli mogu biti deo kernela
+c- staticki vrevedeni moduli mogu biti deo korenskog sistema datoteka rfs
+d- dinamicki prevedeni moduli mogu biti deo privremenog korenskog sistema initrams
+e- staticki prevedeni moduli mogu biti deo privremenog korenskog sistema datoteka initrams
+
+2. Navedi bar 3 nacina na koje je moguce obezbediti konfiguracionu datoteku za prevodjenje
+Linux kernela
+
+3. Navedi 3 osnovna nacina za zauzimanje memorije u Linux kernelu i njihove osnovne
+karakteristike u smislu kada se za koji od njih opredeliti
+
+4. Kako se sve mogu definisati promenljive u Makefile-u.
+Osim nacina definicije sintakse, navedite i njihove osnovne osobine, tako da budu
+jasne razlike.
+
+5. Koje tvrdnje su tacne?
+
+a- Busybox se ne koristi za privremeni korenski sistem datoteka initrams
+b- Busybox apleti se mogu dinamicki ukljucivati/iskljucivati
+c- Busybox apleti se mogu ukljucivati/iskljucivati u Busybox build konfiguraciji
+d- Busybox se moze buildovati sa staticikim i dinamickim bibliotekama
+e- busybox se koristi kao jednostavna zamena za skup tipicnih unix aplikacija
+
+6. Kako bi u slucaju RPi izgledala skripta koja bi omogucila poziv make install nakon
+uspenog builda? Napisi skriptu ne mora biti precizna ali da navodi minimalan skup
+operacija koje je potrebno da se tada izvrse
+
+7. Kada i zbog cega se nakon kernel builda mora uraditi i korak modules_instal i sta
+on predstavlja
+
+8. Kako se postize veza osnovnih struktura iz Linux device modela sa strukturama
+konkretrnih tipova uredjaja/drajvera/magistrala? Sta se moze reci o 
+funkcijama koje su kod takvih drajvera dostupne u poredjenju sa osnovnim iz 
+Char-device API?
+
+9. Drajveri nekih uredjaja se osim na magistralu (bus,infrastructure, core) koja
+odgovara fizickoj magistrali (npr I2C) prijavljuju na jos jednu magistralu.
+Na koju se to magistralu prijavljuju i zbog cega?
+
+10. Напишите скрипту која приказује време и датум, излистава улоговане 
+кориснике на рачунару, исписује податке о систему (процесор, меморија и време 
+које је протекло од стартовања система). Скрипта све информације треба да чува
+у log датотеку.
+
+==========================================================================================
+U-Boot bootloader 
+tftp server
+picocom
+ls -l /dev/ttyUSB0
+picocom -b 115200 /dev/ttyUSB0
+setenv ipaddr <IP adresa rpi>
+setenv serverip <IP adresa pc>
+NFS Server
+editenv bootargs
+tftp 0x01000000 zImage
+zImage
+tftp 0x02000000 bcm2709-rpi-2-b.dtb
+.dbt
+bootz 0x01000000 - 0x02000000
+git clone -b rpi-5.10.y --single-branch https://github.com/raspberrypi/linux
+sudo apt-get install patch
+sudo apt-get install gcc-arm-linux-gnueabihf
+ARCH
+CROSS COMPILE
+Makefile
+export ARCH=arm
+export CROSS_COMPILE=arm-linux-gnueabihf
+make bcm2709_linux_course_defconfig
+
+==========================================================================================
