@@ -1,9 +1,9 @@
-5. Boot on Raspberry Pi or QEMU with NFS root.
+Boot on Raspberry Pi or QEMU with NFS root.
 
 ## Usage Examples
 - **Lab 1 (Driver)**: Load module with `modprobe`, test with `echo` and `cat` on device file.
 - **Lab 2 (BusyBox)**: Use custom `ioctl` applet for string transformations.
-- **Lab 3 (Zad3)**: Connect Nunchuk, control LED via joystick button (C key).
+- **Lab 3 (i2c)**: Connect Nunchuk, control LED via joystick button (C key).
 
 For detailed instructions, refer to the PDF assignments in the `docs/` folder (if uploaded).
 
