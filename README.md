@@ -13,7 +13,7 @@ The course covers embedded Linux topics such as:
 Assignments are organized into branches for each lab:
 - `driver`: Lab 1 - Simple character driver with buffer management and string processing.
 - `busybox`: Lab 2 - BusyBox configuration, hello module with ioctl, and root filesystem setup.
-- `zad3`: Lab 3 - Nunchuk LED driver, platform bus integration, and device tree updates.
+- `i2c`: Lab 3 - Nunchuk LED driver, platform bus integration, and device tree updates.
 
 ## Setup and Requirements
 - **Hardware**: Raspberry Pi (tested on models compatible with the specified kernel commit).
