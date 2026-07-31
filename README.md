@@ -2,6 +2,7 @@
 
 This repository contains code and resources for lab assignments from the "Linux Operating System in Embedded Computers" course. The labs focus on Linux kernel development for Raspberry Pi, including custom modules, BusyBox integration, I2C devices, and device tree modifications.
 
+
 ## Overview
 The course covers embedded Linux topics such as:
 - Kernel configuration and compilation for Raspberry Pi.
