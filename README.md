@@ -15,7 +15,6 @@ Assignments are organized into branches for each lab:
 - `driver`: Lab 1 - Simple character driver with buffer management and string processing.
 - `busybox`: Lab 2 - BusyBox configuration, hello module with ioctl, and root filesystem setup.
 - `i2c`: Lab 3 - Nunchuk LED driver, platform bus integration, and device tree updates.
-
 ## Setup and Requirements
 - **Hardware**: Raspberry Pi (tested on models compatible with the specified kernel commit).
 - **Tools**: QEMU for emulation (optional), cross-compiler (e.g., `arm-none-eabi-gcc`), Git.
